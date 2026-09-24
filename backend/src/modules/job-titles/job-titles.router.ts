@@ -1,0 +1,14 @@
+import { Router } from "express";
+import { authenticate, authorize } from "../../middlewares/auth.js";
+import { asyncHandler } from "../../shared/async-handler.js";
+import { validateBody, validateParams } from "../../shared/validate.js";
+import * as controller from "./job-titles.controller.js";
+import { idParamsSchema, jobTitleSchema, jobTitleUpdateSchema } from "./job-titles.validation.js";
+const router = Router();
+router.use(authenticate);
+router.get("/", asyncHandler(controller.list));
+router.get("/:id", validateParams(idParamsSchema), asyncHandler(controller.get));
+router.post("/", authorize("ADMIN", "HR"), validateBody(jobTitleSchema), asyncHandler(controller.create));
+router.patch("/:id", authorize("ADMIN", "HR"), validateParams(idParamsSchema), validateBody(jobTitleUpdateSchema), asyncHandler(controller.update));
+router.delete("/:id", authorize("ADMIN", "HR"), validateParams(idParamsSchema), asyncHandler(controller.remove));
+export default router;
